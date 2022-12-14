@@ -49,30 +49,12 @@ class StreamControllers {
   }
 
   async list(req, res, next) {
-    const { id, videoId } = req.query;
-    if (id) {
-      const course = await Course.findOne({
-        where: { id: id },
-        include: { model: Video, as: "video" },
-      });
-      return res.json(course);
-    }
-    if (videoId) {
-      const video = await Video.findOne({
-        where: { id: videoId },
-        include: { model: Course, as: "course" },
-      });
-      const nextVideoId = (
-        await Video.findOne({
-          where: { courseId: video.course.id, number: video.number + 1 },
-        })
-      )?.id;
-      const teacher = await User.findOne({
-        where: { id: video.course.userId },
-      });
-      return res.json({ video, nextVideoId, teacher });
-    }
+    const page = req.query.page || 1;
+    const limit = 25;
+    const offset = (page - 1) * limit;
+    const videos = await Video.findAndCountAll({ offset, limit })
+    return res.json(videos);
   }
-}
+} 
 
 module.exports = new StreamControllers();

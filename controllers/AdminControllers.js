@@ -47,7 +47,7 @@ class AdminController {
   }
   async createVideo(req, res, next) {
     try {
-      const { name, countFiles } = req.body;
+      const { name, countFiles, author } = req.body;
       const { img, video } = req.files;
       const fileNameVideo = uuid.v4() + ".mp4";
       const fileNameVideoPath = "720" + fileNameVideo;
@@ -88,13 +88,14 @@ class AdminController {
       }
       const result = await Video.create({
         name,
+        author,
         video: fileNameVideo,
-        img: fileNameImg,
+        img: fileNameImg, 
       });
-
+ 
       for (let i = 0; i < countFiles; i++) {
         const file = req.files[`file[${i}]`];
-        const fileType = file.name.split(".")[1];
+        const fileType = file.name.split(".")[1]; 
         let fileName = uuid.v4() + `.${fileType}`;
         file.mv(path.resolve(__dirname, "..", "files", "files", fileName));
         await File.create({

@@ -10,6 +10,7 @@ const Video = sequelize.define("video", {
     allowNull: false,
   },
   name: { type: DataTypes.STRING, defaultValue: null },
+  author: { type: DataTypes.STRING, defaultValue: null },
   video: { type: DataTypes.STRING, defaultValue: null },
   img: { type: DataTypes.STRING, defaultValue: null },
 });
