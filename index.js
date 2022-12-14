@@ -10,6 +10,7 @@ const fileUpload = require("express-fileupload");
 const router = require("./routes/index");
 const ErrorHandlingMiddleware = require("./middleware/ErrorHandlingMiddleware");
 const path = require("path");
+const { checkConvertVideo } = require("./service/checkConvertVideo");
 const app = express();
 
 app.use(cors());
@@ -26,6 +27,7 @@ const start = async () => {
     await sequelize.authenticate();
     await sequelize.sync();
     httpServer.listen(PORT, () => console.log(`server started on port ${PORT}`));
+    await checkConvertVideo()
     // httpsServer.listen(443, () => console.log(`server started on port 443`)); 
     // app.listen(PORT, ()=> console.log(`server started on port ${PORT}`))
   } catch (error) {
@@ -36,7 +38,7 @@ const start = async () => {
 start();
 
 
-
+ 
 // app.get("/", function (req, res) {
 //   res.sendFile(__dirname + "/index.html");
 // });

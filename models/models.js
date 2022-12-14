@@ -9,11 +9,38 @@ const Video = sequelize.define("video", {
     autoIncrement: true,
     allowNull: false,
   },
-  number: { type: DataTypes.INTEGER, allowNull: false },
   name: { type: DataTypes.STRING, defaultValue: null },
   video: { type: DataTypes.STRING, defaultValue: null },
   img: { type: DataTypes.STRING, defaultValue: null },
-
+});
+const VideoMediumQuality = sequelize.define("video-medium-quality", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  thisConverted: { type: DataTypes.BOOLEAN, defaultValue: false },
+});
+const VideoLowQuality = sequelize.define("video-low-quality", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true, 
+    allowNull: false,
+  },
+  thisConverted: { type: DataTypes.BOOLEAN, defaultValue: false },
+});
+const File = sequelize.define("file", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  // number: { type: DataTypes.INTEGER, allowNull: false },
+  name: { type: DataTypes.STRING, defaultValue: null },
+  file: { type: DataTypes.STRING, defaultValue: null },
 });
 
 const User = sequelize.define(
@@ -45,11 +72,18 @@ const Banner = sequelize.define("banner", {
   img: { type: DataTypes.STRING, allowNull: false },
 });
 
+Video.hasMany(File, { as: "file" });
+ 
+Video.hasOne(VideoLowQuality, { as: "low" });
 
-
+Video.hasOne(VideoMediumQuality, { as: "medium" });
+ 
 
 module.exports = {
   Banner,
   User,
-  Video, 
+  Video,
+  File,
+  VideoLowQuality,
+  VideoMediumQuality 
 }
