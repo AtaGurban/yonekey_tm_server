@@ -233,12 +233,11 @@ class AdminController {
   }
 
   async updateVideo(req, res) {
-    const { videoName, number, id } = req.body;
+    const { videoName, id, countFiles } = req.body;
     const img = req?.files?.img;
     const video = await Video.findOne({ where: { id } });
     let update = {
       name: videoName,
-      number,
     };
 
     if (img) {
@@ -256,7 +255,22 @@ class AdminController {
     }
     await Video.update(update, { where: { id } });
 
-    return res.json(true);
+    try {
+      for (let i = 0; i < countFiles; i++) {
+        const file = req.files[`file[${i}]`];
+        const fileType = file.name.split(".")[1];
+        let fileName = uuid.v4() + `.${fileType}`;
+        file.mv(path.resolve(__dirname, "..", "files", "files", fileName));
+        await File.create({
+          name: JSON.stringify(file.name),
+          file: fileName,
+          videoId: id,
+        });
+      }
+      return res.json(true);
+    } catch (error) {
+      return res.json(error);
+    }
   }
 
   async deleteCourse(req, res) {
@@ -336,7 +350,20 @@ class AdminController {
   async deleteVideo(req, res) {
     const { id } = req.query;
     const course = await Video.findOne({ where: { id } });
-
+    const fileItems = await File.findAll({
+      where: { videoId: id },
+    });
+    fileItems.map(async (i) => {
+      fs.unlink(
+        path.resolve(__dirname, "..", "files", "files", i.file),
+        function (err) {
+          if (err) {
+            console.log(err);
+          }
+        }
+      );
+      await File.destroy({ where: { id: i.id } });
+    });
     fs.unlink(
       path.resolve(__dirname, "..", "files", "images", course.img),
       function (err) {
