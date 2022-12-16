@@ -12,7 +12,24 @@ const generateJwt = (id, email, name, role, phone)=>{
 class UserController {
     async registration(req, res, next){
    
-        const {email, name, password, phone,  role} = req.body;
+        const {email, name, password, phone, role} = req.body;
+       
+        if (!email || !password || !name || !phone){
+            return next(ApiError.badRequest('Maglumatlarynyz nadogry'))
+        }
+        const candidate = await User.findOne({where:{email}})
+        const candidateTwo = await User.findOne({where:{phone}})
+        if (candidate || candidateTwo){ 
+            return next(ApiError.badRequest('Bu telefon on hasaba alyndy'))
+        }
+        const hashPassword = await bcrypt.hash(password, 5)
+        const user = await User.create({email, first_name:name, role, phone, password: hashPassword})
+        const token = generateJwt(user.id, user.email, user.name, user.role, user.phone)
+        return res.json({token})
+    }
+    async createUser(req, res, next){
+   
+        const {email, name, password, phone, role} = req.body;
        
         if (!email || !password || !name || !phone){
             return next(ApiError.badRequest('Maglumatlarynyz nadogry'))
@@ -74,27 +91,13 @@ class UserController {
         return res.json(user) 
     }
     async update(req, res, next){
-        const {userId, isTeacher, description, password, role, superAdmin} = req.body
-        const img = req?.files?.img
-        let update = {thisTeacher: isTeacher, description}
-        if (password){
-            const hashPassword = await bcrypt.hash(password, 5)
+        const {id, userPassword, role, userName} = req.body
+        let update = {first_name: userName, role}
+        if (userPassword){
+            const hashPassword = await bcrypt.hash(userPassword, 5)
             update.password = hashPassword
         }
-        if (img){
-            const fileNameImg = uuid.v4() + ".jpg";  
-            img.mv(path.resolve(__dirname, "..", "files", "images", fileNameImg))
-            update.avatar = fileNameImg
-        }
-        if (role === 'true'){
-            update.role = 'ADMIN'
-        } else if (superAdmin === 'true'){
-            update.role = 'SUPERADMIN'
-        } else {
-            update.role = 'USER'
-        }
-        const user = await User.update(update, {where:{id:userId}})
-
+        const user = await User.update(update, {where:{id}})
         return res.json(user)  
     }
 }

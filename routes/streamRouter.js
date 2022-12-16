@@ -9,7 +9,7 @@ router.get('/', StreamControllers.stream)
 router.get('/list', StreamControllers.list) 
 router.get('/file', StreamControllers.getFileByVideo) 
 router.get('/getOneVideo', StreamControllers.getOneVideo) 
-// router.delete('/remove', StreamControllers.remove) 
+// router.delete('/remove', StreamControllers.remove)
 
 
 

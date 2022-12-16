@@ -11,40 +11,6 @@ ffmpeg.setFfprobePath(ffprobePath);
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 class AdminController {
-  async createCourse(req, res, next) {
-    try {
-      const { name, description, favourite, teacher } = req.body;
-      const { imgFile } = req.files;
-      if (!name || !description || !favourite || !teacher || !imgFile) {
-        return next(ApiError.internal("Maglumatlar doly dal"));
-      }
-      const teacherdata = await User.findOne({
-        where: { phone: teacher, thisTeacher: true },
-      });
-      if (!teacherdata) {
-        return next(ApiError.internal("Munun yaly mugallym yok"));
-      }
-      const checkCourse = await Course.findOne({ where: { name } });
-      if (checkCourse) {
-        return next(ApiError.internal("Munun yaly kurs onem bar"));
-      }
-      let img = uuid.v4() + ".jpg";
-
-      imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
-
-      const course = await Course.create({
-        name,
-        img,
-        description,
-        favourite,
-        userId: teacherdata.id,
-      });
-
-      return res.json(course);
-    } catch (error) {
-      next(ApiError.internal(error.message));
-    }
-  }
   async createVideo(req, res, next) {
     try {
       const { name, countFiles, author } = req.body;
@@ -110,15 +76,6 @@ class AdminController {
     }
   }
 
-  async getAll(req, res) {
-    const list = await Course.findAll();
-    return res.json(list);
-  }
-
-  async getFavouriteCourse(req, res) {
-    const list = await Course.findAll({ where: { favourite: true } });
-    return res.json(list);
-  }
   async getAllVideo(req, res) {
     const { id } = req.query;
     const list = await Video.findAll({ where: { courseId: id } });
@@ -131,11 +88,12 @@ class AdminController {
     const users = await User.findAndCountAll({ offset, limit });
     // users.rows = users.rows.slice((page - 1 ) * limit, page * limit)
     return res.json(users);
-  }
+  } 
   async createBanner(req, res) {
-    const img = req?.files?.img;
-    if (img) {
-      const bannerCheck = await Banner.findOne({ where: { page: "main" } });
+    const { page } = req.body;
+    const banner = req?.files?.banner;
+    if (banner) {
+      const bannerCheck = await Banner.findOne({ where: { page}});
       if (bannerCheck) {
         fs.unlink(
           path.resolve(__dirname, "..", "files", "images", bannerCheck.img),
@@ -148,12 +106,12 @@ class AdminController {
         bannerCheck.destroy();
       }
       const fileNameImg = uuid.v4() + ".gif";
-      img.mv(path.resolve(__dirname, "..", "files", "images", fileNameImg));
-      const banner = await Banner.create({
-        page: "main",
+      banner.mv(path.resolve(__dirname, "..", "files", "images", fileNameImg));
+      const bannerCreate = await Banner.create({
+        page,
         img: fileNameImg,
       });
-      return res.json(banner);
+      return res.json(bannerCreate);
     }
   }
   async getBanner(req, res) {
@@ -184,52 +142,6 @@ class AdminController {
       banner.destroy();
     }
     return res.json(banner);
-  }
-
-  async buyCourse(req, res, next) {
-    const { number, userId } = req.body;
-    const course = await Course.findOne({ where: { id: number } });
-    const user = await User.findOne({ where: { id: userId } });
-    if (!user || !course) {
-      return next(ApiError.internal("Girizilen maglumatlar yalnys"));
-    }
-    const checkTransaction = await Transaction.findOne({
-      where: { userId, courseId: number },
-    });
-    if (checkTransaction) {
-      return next(ApiError.internal("Bu ulanyjyda bu kurs onem bar"));
-    }
-    const transaction = await Transaction.create({
-      userId,
-      courseId: number,
-    });
-    return res.json(transaction);
-  }
-  async updateCourse(req, res) {
-    const { courseName, description, favCourse, id } = req.body;
-    const img = req?.files?.img;
-    const course = await Course.findOne({ where: { id } });
-    let update = {
-      name: courseName,
-      description,
-      favourite: favCourse,
-    };
-    if (img) {
-      fs.unlink(
-        path.resolve(__dirname, "..", "files", "images", course.img),
-        function (err) {
-          if (err) {
-            console.log(err);
-          }
-        }
-      );
-      const fileNameImg = uuid.v4() + ".jpg";
-      img.mv(path.resolve(__dirname, "..", "files", "images", fileNameImg));
-      update.img = fileNameImg;
-    }
-    await Course.update(update, { where: { id } });
-
-    return res.json(true);
   }
 
   async updateVideo(req, res) {
@@ -273,80 +185,6 @@ class AdminController {
     }
   }
 
-  async deleteCourse(req, res) {
-    const { id } = req.query;
-    const course = await Course.findOne({ where: { id } });
-    const courseWideos = await Video.findAll({ where: { courseId: id } });
-    courseWideos.map((i) => {
-      fs.unlink(
-        path.resolve(__dirname, "..", "files", "images", i.img),
-        function (err) {
-          if (err) {
-            console.log(err);
-          }
-        }
-      );
-      fs.unlink(
-        path.resolve(
-          __dirname,
-          "..",
-          "files",
-          "ConvertedVideo",
-          `720${i.video}`
-        ),
-        function (err) {
-          if (err) {
-            console.log(err);
-          }
-        }
-      );
-      fs.unlink(
-        path.resolve(
-          __dirname,
-          "..",
-          "files",
-          "ConvertedVideo",
-          `480${i.video}`
-        ),
-        function (err) {
-          if (err) {
-            console.log(err);
-          }
-        }
-      );
-      fs.unlink(
-        path.resolve(
-          __dirname,
-          "..",
-          "files",
-          "ConvertedVideo",
-          `360${i.video}`
-        ),
-        function (err) {
-          if (err) {
-            console.log(err);
-          }
-        }
-      );
-      i.destroy();
-    });
-    fs.unlink(
-      path.resolve(__dirname, "..", "files", "images", course.img),
-      function (err) {
-        if (err) {
-          console.log(err);
-        }
-      }
-    );
-    course.destroy();
-    const transactionsItems = await Transaction.findAll({
-      where: { courseId: null },
-    });
-    transactionsItems.map(async (i) => {
-      await Transaction.destroy({ where: { id: i.id } });
-    });
-    return res.json(course);
-  }
   async deleteVideo(req, res) {
     const { id } = req.query;
     const course = await Video.findOne({ where: { id } });
