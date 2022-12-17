@@ -62,6 +62,18 @@ const User = sequelize.define(
 
  
 
+const Business = sequelize.define("business", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  name: { type: DataTypes.STRING, allowNull: false },
+  link: { type: DataTypes.STRING, allowNull: false },
+  img: { type: DataTypes.STRING, allowNull: false },
+});
+
 const Banner = sequelize.define("banner", {
   id: {
     type: DataTypes.BIGINT,
@@ -86,5 +98,6 @@ module.exports = {
   Video,
   File,
   VideoLowQuality,
-  VideoMediumQuality 
+  VideoMediumQuality,
+  Business 
 }

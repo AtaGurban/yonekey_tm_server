@@ -10,10 +10,9 @@ class BannerController {
             return next(ApiError.badRequest('Maglumatlarynyz nadogry'))
         }
         const pageItem = await Banner.findOne({where:{page}})
-        console.log(pageItem);
-        if (!pageItem){ 
-            return next(ApiError.badRequest('Sahypa tapylmady'))
-        }
+        // if (!pageItem){ 
+        //     return next(ApiError.badRequest('Sahypa tapylmady'))
+        // }
         return res.json(pageItem)
     }
 }

@@ -1,4 +1,4 @@
-const { Course, Video, User, File, Banner } = require("../models/models");
+const { Course, Video, User, File, Banner, Business } = require("../models/models");
 const fs = require("fs");
 const ApiError = require("../error/ApiError");
 const uuid = require("uuid");
@@ -119,6 +119,37 @@ class AdminController {
     // users.rows = users.rows.slice((page - 1 ) * limit, page * limit)
     return res.json(banners);
   }
+  async getBusiness(req, res) {
+    try {
+      const business = await Business.findAll();
+      return res.json(business);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+
+  }
+  async createBusiness(req, res) {
+    try {
+      const {name, link} = req.body;
+      const {img} = req.files
+      if (!name || !link || !img){
+        return next(ApiError.internal('Maglumatlar doly dal'));
+      }
+      const checkBusiness = await Business.findOne({where:{name}})
+      if (checkBusiness){
+        return next(ApiError.internal('Munun yaly biznes onem bar'));
+      }
+      const fileNameImg = uuid.v4() + ".jpg";
+      img.mv(path.resolve(__dirname, "..", "files", "images", fileNameImg));
+      const business = await Business.create({
+        name, link, img: fileNameImg
+      })
+      return res.json(business)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+
   // async updateBanner(req, res) {
   //   const page = req.query.page || 1;
   //   const limit = 10;
