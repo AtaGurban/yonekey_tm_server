@@ -71,7 +71,8 @@ const Business = sequelize.define("business", {
   },
   name: { type: DataTypes.STRING, allowNull: false },
   link: { type: DataTypes.STRING, allowNull: false },
-  img: { type: DataTypes.STRING, allowNull: false },
+  img: { type: DataTypes.STRING, allowNull: false }, 
+  counter: {type: DataTypes.BIGINT, defaultValue: 0}
 });
 
 const Banner = sequelize.define("banner", {

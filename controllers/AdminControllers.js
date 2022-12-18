@@ -76,12 +76,12 @@ class AdminController {
     }
   }
 
-  async getAllVideo(req, res) {
+  async getAllVideo(req, res, next) {
     const { id } = req.query;
     const list = await Video.findAll({ where: { courseId: id } });
     return res.json(list);
   }
-  async getAllUsers(req, res) {
+  async getAllUsers(req, res, next) {
     const page = req.query.page || 1;
     const limit = 10;
     const offset = (page - 1) * limit;
@@ -89,7 +89,7 @@ class AdminController {
     // users.rows = users.rows.slice((page - 1 ) * limit, page * limit)
     return res.json(users);
   } 
-  async createBanner(req, res) {
+  async createBanner(req, res, next) {
     const { page } = req.body;
     const banner = req?.files?.banner;
     if (banner) {
@@ -114,24 +114,97 @@ class AdminController {
       return res.json(bannerCreate);
     }
   }
-  async getBanner(req, res) {
+  async getBanner(req, res, next) {
     const banners = await Banner.findAll();
     // users.rows = users.rows.slice((page - 1 ) * limit, page * limit)
     return res.json(banners);
   }
-  async getBusiness(req, res) {
+  async getBusiness(req, res, next) {
     try {
       const business = await Business.findAll();
       return res.json(business);
     } catch (error) {
       return next(ApiError.internal(error));
     }
-
   }
-  async createBusiness(req, res) {
+  async businessClick(req, res, next) {
+    try {
+      const {id} = req.body
+      if (id){
+        const business = await Business.findOne({where:{id}})
+        if (!business){
+          return next(ApiError.internal('error'));
+        }
+        let update = {counter: business.counter + 1}
+        await Business.update(update, {where: {id}})
+      }
+      return res.json(true);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async deleteBusiness(req, res, next) {
+    try {
+      const {id} = req.query
+      const business = await Business.findOne({where:{id}});
+      if (!business){
+        return next(ApiError.internal('error'));
+      }
+      fs.unlink(
+        path.resolve(__dirname, "..", "files", "images", business.img),
+        function (err) {
+          if (err) {
+            console.log(err);
+          }
+        }
+      );
+      business.destroy()
+      return res.json(business);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async updateBusiness(req, res, next) {
+    try {
+      const {name, link, id} = req.body;
+      const img = req.files?.img
+      if (!id){
+        return next(ApiError.internal('error'));
+      }
+      const business = await Business.findOne({where:{id}})
+      if (!business){
+        return next(ApiError.internal('Biznes tapylmady'));
+      }
+      let update = {}
+      if (name){
+        update.name = name
+      }
+      if (link){
+        update.link = link
+      }
+      if (img){
+        fs.unlink(
+          path.resolve(__dirname, "..", "files", "images", business.img),
+          function (err) {
+            if (err) {
+              console.log(err);
+            }
+          }
+        );
+        const fileNameImg = uuid.v4() + ".jpg";
+        img.mv(path.resolve(__dirname, "..", "files", "images", fileNameImg));
+        update.img = fileNameImg
+      }
+      await Business.update(update, { where: { id } });
+      return res.json(true);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async createBusiness(req, res, next) {
     try {
       const {name, link} = req.body;
-      const {img} = req.files
+      const img = req.files?.img
       if (!name || !link || !img){
         return next(ApiError.internal('Maglumatlar doly dal'));
       }
@@ -150,7 +223,7 @@ class AdminController {
     }
   }
 
-  // async updateBanner(req, res) {
+  // async updateBanner(req, res, next) {
   //   const page = req.query.page || 1;
   //   const limit = 10;
   //   const offset = (page - 1) * limit;
@@ -158,7 +231,7 @@ class AdminController {
   //   // users.rows = users.rows.slice((page - 1 ) * limit, page * limit)
   //   return res.json(users);
   // }
-  async deleteBanner(req, res) {
+  async deleteBanner(req, res, next) {
     const { id } = req.query;
     const banner = await Banner.findOne({ id });
     if (banner) {
@@ -175,7 +248,7 @@ class AdminController {
     return res.json(banner);
   }
 
-  async updateVideo(req, res) {
+  async updateVideo(req, res, next) {
     const { videoName, id, countFiles } = req.body;
     const img = req?.files?.img;
     const video = await Video.findOne({ where: { id } });
@@ -216,7 +289,7 @@ class AdminController {
     }
   }
 
-  async deleteVideo(req, res) {
+  async deleteVideo(req, res, next) {
     const { id } = req.query;
     const course = await Video.findOne({ where: { id } });
     const fileItems = await File.findAll({

@@ -1,16 +1,19 @@
 const Router = require('express')
 const AdminControllers = require('../controllers/AdminControllers')
 const router = new Router()
-const authMiddleware = require('../middleware/authMiddleware')
+
 
 
 
 // router.post('/create-course',authMiddleware, AdminControllers.createCourse)
 // router.put('/update-course',authMiddleware, AdminControllers.updateCourse)
-router.put('/update-video',authMiddleware, AdminControllers.updateVideo)
-router.post('/create-video',authMiddleware, AdminControllers.createVideo)
-router.post('/business',authMiddleware, AdminControllers.createBusiness)
-router.get('/business',authMiddleware, AdminControllers.getBusiness)
+router.put('/update-video', AdminControllers.updateVideo)
+router.post('/create-video', AdminControllers.createVideo)
+router.post('/business', AdminControllers.createBusiness)
+router.get('/business', AdminControllers.getBusiness)
+router.put('/business', AdminControllers.updateBusiness)
+router.post('/business-click', AdminControllers.businessClick)
+router.delete('/business', AdminControllers.deleteBusiness)
 // router.post('/buy-course',authMiddleware, AdminControllers.buyCourse)
 router.get('/getvideo', AdminControllers.getAllVideo)
 // router.get('/get-all-course', AdminControllers.getAll)
