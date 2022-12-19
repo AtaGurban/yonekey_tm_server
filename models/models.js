@@ -60,8 +60,6 @@ const User = sequelize.define(
   }
 );
 
- 
-
 const Business = sequelize.define("business", {
   id: {
     type: DataTypes.BIGINT,
@@ -75,6 +73,18 @@ const Business = sequelize.define("business", {
   counter: {type: DataTypes.BIGINT, defaultValue: 0}
 });
 
+const SliderForMainPage = sequelize.define("slider-for-main-page", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },  
+  // text: { type: DataTypes.STRING, allowNull: false },
+  link: { type: DataTypes.STRING, allowNull: false },
+  number: { type: DataTypes.INTEGER, allowNull: false },
+});
+
 const Banner = sequelize.define("banner", {
   id: {
     type: DataTypes.BIGINT,
@@ -85,6 +95,18 @@ const Banner = sequelize.define("banner", {
   page: { type: DataTypes.STRING, allowNull: false },
   img: { type: DataTypes.STRING, allowNull: false },
 });
+
+const ImgForSlider = sequelize.define("img-for-slider", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  img: { type: DataTypes.STRING, allowNull: false },
+});
+
+SliderForMainPage.hasMany(ImgForSlider, {as: 'img'})
 
 Video.hasMany(File, { as: "file" });
  
@@ -100,5 +122,7 @@ module.exports = {
   File,
   VideoLowQuality,
   VideoMediumQuality,
-  Business 
+  Business,
+  SliderForMainPage,
+  ImgForSlider 
 }

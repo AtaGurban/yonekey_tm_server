@@ -72,7 +72,7 @@ class AdminController {
       }
       return res.json(result);
     } catch (error) {
-      next(ApiError.internal(error.message));
+      return next(ApiError.internal(error.message));
     }
   }
 

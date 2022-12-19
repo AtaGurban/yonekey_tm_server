@@ -102,7 +102,7 @@ class StreamControllers {
   async list(req, res, next) {
     try {
       const page = req.query.page || 1;
-      const limit = 25;
+      const limit = 250;
       const offset = (page - 1) * limit;
       const videos = await Video.findAndCountAll({ offset, limit, include:{model:File, as:'file'} })
       return res.json(videos);
