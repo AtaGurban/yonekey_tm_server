@@ -1,5 +1,5 @@
 const ApiError = require("../error/ApiError");
-const { SliderForMainPage, ImgForSlider } = require("../models/models");
+const { SliderForMainPage, ImgForSlider, TitleCategory } = require("../models/models");
 const fs = require("fs");
 const uuid = require("uuid");
 const path = require("path");
@@ -21,10 +21,64 @@ class MainPageController {
       return next(ApiError.internal(error));
     }
   }
+  async getTitleCategory(req, res, next) {
+    try {
+      const titleCategoryAll = await TitleCategory.findAll()
+      return res.json(titleCategoryAll)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async updateTitleCategory(req, res, next) {
+    try {
+      const {id, number, name} = req.body
+      if (!id){
+        return next(ApiError.internal('error'));
+      }
+      let update = {number, name}
+      const updatedTitleCategory = await TitleCategory.update(update, {where:{id}})
+      return res.json(updatedTitleCategory)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async deleteTitleCategory(req, res, next) {
+    try {
+      const {id} = req.query
+      if (!id){
+        return next(ApiError.internal('error'));
+      }
+      const titleCategory = await TitleCategory.findOne({where:{id}})
+      if (titleCategory){
+        titleCategory.destroy()
+      }
+      return res.json(titleCategory)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async createTitleCategory(req, res, next) {
+    try {
+      const {number, name} = req.body
+      if (!name || !number){
+        return next(ApiError.internal('error'));
+      }
+      const oldTitleCategory = await TitleCategory.findOne({where:{number}})
+      if (oldTitleCategory){
+        oldTitleCategory.destroy()
+      }
+      const titleCategory = await TitleCategory.create({
+        name, number
+      })
+      return res.json(titleCategory)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
   async createSlider(req, res, next) {
     try {
-      const { number, link, countFiles } = req.body;
-      if (!number || !link || !countFiles) {
+      const { number, countFiles } = req.body;
+      if (!number || !countFiles) {
         return next(ApiError.internal("Maglumatlar doly däl"));
       }
       const oldSlider = await SliderForMainPage.findOne({ where: { number } });
@@ -47,7 +101,6 @@ class MainPageController {
       }
       const slider = await SliderForMainPage.create({
         number,
-        link,
       });
       for (let i = 0; i < countFiles; i++) {
         const file = req.files[`file[${i}]`];
@@ -74,7 +127,23 @@ class MainPageController {
         const {id} = req.query
         const slider = await SliderForMainPage.findOne({where:{id}})
         if (slider){
-            slider.destroy()
+          console.log(slider);
+          const oldImages = await ImgForSlider.findAll({
+            where: { sliderForMainPageId: slider.id },
+          });
+          oldImages.map(async (i) => {
+            fs.unlink(
+              path.resolve(__dirname, "..", "files", "images", i.img),
+              function (err) {
+                if (err) {
+                  console.log(err);
+                }
+              }
+            );
+            await i.destroy();
+          });
+          await slider.destroy()
+            
         }
         return res.json(true)
     } catch (error) {

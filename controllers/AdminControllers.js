@@ -9,7 +9,7 @@ const { resolve } = require("path");
 const ffprobePath = require('@ffprobe-installer/ffprobe').path;
 ffmpeg.setFfprobePath(ffprobePath);
 ffmpeg.setFfmpegPath(ffmpegPath);
-
+ 
 class AdminController {
   async createVideo(req, res, next) {
     try {

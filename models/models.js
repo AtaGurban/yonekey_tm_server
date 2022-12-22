@@ -39,12 +39,56 @@ const File = sequelize.define("file", {
     autoIncrement: true,
     allowNull: false,
   },
-  // number: { type: DataTypes.INTEGER, allowNull: false },
   name: { type: DataTypes.STRING, defaultValue: null },
   file: { type: DataTypes.STRING, defaultValue: null },
 });
+const Category = sequelize.define("category", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  counter: { type: DataTypes.INTEGER, allowNull: false },
+  name: { type: DataTypes.STRING, defaultValue: null },
+  link: { type: DataTypes.STRING, defaultValue: null },
+});
 
-const User = sequelize.define(
+const TitleCategory = sequelize.define("title_category", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  number: { type: DataTypes.INTEGER, allowNull: false },
+  name: { type: DataTypes.STRING, defaultValue: null },
+});
+
+const TitleSubCategory = sequelize.define("title_sub_category", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  number: { type: DataTypes.INTEGER, allowNull: false },
+  name: { type: DataTypes.STRING, defaultValue: null },
+});
+
+const SubCategory = sequelize.define("sub_category", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  counter: { type: DataTypes.INTEGER, allowNull: false },
+  name: { type: DataTypes.STRING, defaultValue: null },
+  link: { type: DataTypes.STRING, defaultValue: null },
+});
+
+const User = sequelize.define( 
   "user",
   {
     id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true,},
@@ -80,10 +124,10 @@ const SliderForMainPage = sequelize.define("slider-for-main-page", {
     autoIncrement: true,
     allowNull: false,
   },  
-  // text: { type: DataTypes.STRING, allowNull: false },
-  link: { type: DataTypes.STRING, allowNull: false },
+  // text: { type: DataTypes.STRING, defaultValue: null },
+  // link: { type: DataTypes.STRING, allowNull: false },
   number: { type: DataTypes.INTEGER, allowNull: false },
-});
+}); 
 
 const Banner = sequelize.define("banner", {
   id: {
@@ -109,6 +153,12 @@ const ImgForSlider = sequelize.define("img-for-slider", {
 SliderForMainPage.hasMany(ImgForSlider, {as: 'img'})
 
 Video.hasMany(File, { as: "file" });
+
+TitleCategory.hasMany(Category, { as: "category" });
+
+Category.hasMany(TitleSubCategory, { as: "title_sub_category" });
+
+TitleSubCategory.hasMany(SubCategory, { as: "sub_category" });
  
 Video.hasOne(VideoLowQuality, { as: "low" });
 
@@ -120,6 +170,10 @@ module.exports = {
   User,
   Video,
   File,
+  SubCategory,
+  TitleCategory,
+  TitleSubCategory,
+  Category,
   VideoLowQuality,
   VideoMediumQuality,
   Business,
