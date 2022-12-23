@@ -49,9 +49,11 @@ const Category = sequelize.define("category", {
     autoIncrement: true,
     allowNull: false,
   },
-  counter: { type: DataTypes.INTEGER, allowNull: false },
+  counter: { type: DataTypes.INTEGER, defaultValue: 0 },
   name: { type: DataTypes.STRING, defaultValue: null },
-  link: { type: DataTypes.STRING, defaultValue: null },
+  link: { type: DataTypes.STRING, defaultValue: null }, 
+  img: { type: DataTypes.STRING, defaultValue: null }, 
+  withLink: { type: DataTypes.BOOLEAN, defaultValue: false },
 });
 
 const TitleCategory = sequelize.define("title_category", {
@@ -79,12 +81,13 @@ const TitleSubCategory = sequelize.define("title_sub_category", {
 const SubCategory = sequelize.define("sub_category", {
   id: {
     type: DataTypes.BIGINT,
-    primaryKey: true,
+    primaryKey: true, 
     autoIncrement: true,
     allowNull: false,
   },
-  counter: { type: DataTypes.INTEGER, allowNull: false },
+  counter: { type: DataTypes.INTEGER, defaultValue: 0 },
   name: { type: DataTypes.STRING, defaultValue: null },
+  img: { type: DataTypes.STRING, defaultValue: null }, 
   link: { type: DataTypes.STRING, defaultValue: null },
 });
 

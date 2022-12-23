@@ -1,5 +1,5 @@
 const ApiError = require("../error/ApiError");
-const { SliderForMainPage, ImgForSlider, TitleCategory } = require("../models/models");
+const { SliderForMainPage, ImgForSlider, TitleCategory, Category } = require("../models/models");
 const fs = require("fs");
 const uuid = require("uuid");
 const path = require("path");
@@ -21,10 +21,47 @@ class MainPageController {
       return next(ApiError.internal(error));
     }
   }
+  async updateCategory(req, res, next) {
+    try { 
+      const {name, link, withLink, titleCategoryId, id} = req.body
+      const img = req?.files?.img;
+      if (!name || !titleCategoryId || !id){
+        return next(ApiError.internal('Maglumatlar doly dal'));
+      }
+      const category = await Category.findOne({where:{id}})
+      if (!category){
+        return next(ApiError.internal('Munun yaly yok'));
+      }
+      let update = {name, titleCategoryId, link, withLink }
+      if (img){
+        const fileNameImg = uuid.v4() + ".jpg";
+        img.mv(path.resolve(__dirname, "..", "files", "images", fileNameImg));
+        update.img = fileNameImg
+        fs.unlink(
+          path.resolve(__dirname, "..", "files", "images", category.img),
+          function (err) {
+            if (err) {
+              console.log(err);
+            }
+          }
+        );
+      }
+      await Category.update(update, {where:{id}})
+      return res.json(true)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
   async getTitleCategory(req, res, next) {
     try {
-      const titleCategoryAll = await TitleCategory.findAll()
-      return res.json(titleCategoryAll)
+      const {category} = req.query
+      if (category){
+        const titleCategoryAll = await TitleCategory.findAll({include:{model:Category, as:'category'}})
+        return res.json(titleCategoryAll)
+      } else {
+        const titleCategoryAll = await TitleCategory.findAll()
+        return res.json(titleCategoryAll)
+      }
     } catch (error) {
       return next(ApiError.internal(error));
     }
@@ -71,6 +108,54 @@ class MainPageController {
         name, number
       })
       return res.json(titleCategory)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async createCategory(req, res, next) {
+    try {
+      const {name, link, withLink, titleCategoryId} = req.body
+      const img = req?.files?.img;
+      if (!name || !titleCategoryId || !img){
+        return next(ApiError.internal('error'));
+      }
+      const fileNameImg = uuid.v4() + ".jpg";
+      img.mv(path.resolve(__dirname, "..", "files", "images", fileNameImg));
+      const category = await Category.create({
+        name, titleCategoryId, link, withLink, img: fileNameImg
+      })
+      return res.json(category)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async getCategory(req, res, next) {
+    try {
+      const categorys = await Category.findAll()
+      return res.json(categorys)
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async deleteCategory(req, res, next) {
+    try {
+      const {id} = req.query
+      if (!id){
+        return next(ApiError.internal('error'));
+      }
+      const category = await Category.findOne({where:{id}})
+      if (category){
+        fs.unlink(
+          path.resolve(__dirname, "..", "files", "images", category.img),
+          function (err) {
+            if (err) {
+              console.log(err);
+            }
+          }
+        );
+        category.destroy()
+      }
+      return res.json(category)
     } catch (error) {
       return next(ApiError.internal(error));
     }
@@ -127,7 +212,6 @@ class MainPageController {
         const {id} = req.query
         const slider = await SliderForMainPage.findOne({where:{id}})
         if (slider){
-          console.log(slider);
           const oldImages = await ImgForSlider.findAll({
             where: { sliderForMainPageId: slider.id },
           });
