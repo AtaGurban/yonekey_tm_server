@@ -42,7 +42,7 @@ class EducationControllers {
     const {name, price} = req.body
     const {imgFile} = req.files
     let img = uuid.v4() + ".jpg";
-    imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
+    await imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
     const city = await City.create({
         img, price, name
     })
@@ -58,7 +58,7 @@ class EducationControllers {
     if (imgFile){
       await removeImg(city.img)
       let img = uuid.v4() + ".jpg";
-      imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
+      await imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
       update.img = img
     }
     await City.update(update, {where:{id}})
@@ -85,7 +85,7 @@ class EducationControllers {
     const {name, price, cityId} = req.body
     const {imgFile} = req.files
     let img = uuid.v4() + ".jpg";
-    imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
+    await imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
     const collage = await Collage.create({
         img, price, name, cityId:(+cityId)
     })
@@ -101,7 +101,7 @@ class EducationControllers {
     if (imgFile){
       await removeImg(collage.img)
       let img = uuid.v4() + ".jpg";
-      imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
+      await imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
       update.img = img
     }
     await Collage.update(update, {where:{id}})
@@ -123,7 +123,7 @@ class EducationControllers {
     const {name, price, collageId} = req.body
     const {imgFile} = req.files
     let img = uuid.v4() + ".jpg";
-    imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
+    await imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
     const direction = await Direction.create({
         img, price, name, collageId:(+collageId)
     })
@@ -139,7 +139,7 @@ class EducationControllers {
     if (imgFile){
       await removeImg(direction.img)
       let img = uuid.v4() + ".jpg";
-      imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
+      await imgFile.mv(path.resolve(__dirname, "..", "files", "images", img));
       update.img = img
     }
     await Direction.update(update, {where:{id}})

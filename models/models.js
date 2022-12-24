@@ -150,7 +150,8 @@ const ImgForSlider = sequelize.define("img-for-slider", {
     autoIncrement: true,
     allowNull: false,
   },
-  img: { type: DataTypes.STRING, allowNull: false },
+  webImg: { type: DataTypes.STRING, allowNull: false },
+  mobileImg: { type: DataTypes.STRING, allowNull: false },
 });
 
 SliderForMainPage.hasMany(ImgForSlider, {as: 'img'})

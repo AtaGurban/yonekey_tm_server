@@ -7,9 +7,6 @@ const bannerRouter = require('./bannerRouter')
 const mainPageRouter = require('./MainPageRouter')
 
 
-
-
-   
 router.use('/video', streamRouter) 
 router.use('/user', userRouter) 
 router.use('/banner', bannerRouter) 
@@ -17,7 +14,4 @@ router.use('/admin', adminRouter)
 router.use('/main-page', mainPageRouter) 
 
 
-
-
-
-module.exports = router 
+module.exports = router
