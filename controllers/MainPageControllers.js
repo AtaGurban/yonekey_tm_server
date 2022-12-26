@@ -145,16 +145,16 @@ class MainPageController {
   }
   async updateSubCategory(req, res, next) {
     try {
-      const { name, link, titleSubCategoryId, id } = req.body;
+      const { name, link, id } = req.body;
       const img = req?.files?.img;
-      if (!name || !titleSubCategoryId || !id || !link) {
+      if (!name || !id || !link) {
         return next(ApiError.internal("Maglumatlar doly dal"));
       }
       const subCategory = await SubCategory.findOne({ where: { id } });
       if (!subCategory) {
         return next(ApiError.internal("Munun yaly yok"));
       }
-      let update = { name, titleSubCategoryId, link, withLink };
+      let update = { name, link };
       if (img) {
         const fileNameImg = uuid.v4() + ".jpg";
         await img.mv(
@@ -173,6 +173,7 @@ class MainPageController {
       await SubCategory.update(update, { where: { id } });
       return res.json(true);
     } catch (error) {
+      console.log(error);
       return next(ApiError.internal(error));
     }
   }
@@ -194,13 +195,18 @@ class MainPageController {
   }
   async getTitleSubCategory(req, res, next) {
     try {
-      const { subCategory } = req.query;
+      const { subCategory, id } = req.query;
       if (subCategory) {
         const titleCategoryAll = await TitleSubCategory.findAll({
           include: { model: SubCategory, as: "sub_category" },
         });
         return res.json(titleCategoryAll);
-      } else {
+      } else if (id){
+        const titleSubCategoryAll = await TitleSubCategory.findAll({
+          where:{categoryId:id}, include: { model: SubCategory, as: "sub_category" },
+        })
+        return res.json(titleSubCategoryAll);
+      }  else {
         const titleCategoryAll = await TitleSubCategory.findAll();
         return res.json(titleCategoryAll);
       }
@@ -272,7 +278,7 @@ class MainPageController {
         where: { number },
       });
       if (oldTitleCategory) {
-        oldTitleCategory.destroy();
+        await deleteTitleCategoryFunc(oldTitleCategory.id)
       }
       const titleCategory = await TitleCategory.create({
         name,
@@ -293,7 +299,7 @@ class MainPageController {
         where: { number },
       });
       if (oldTitleCategory) {
-        oldTitleCategory.destroy();
+        await deleteTitleSubCategoryFunc(oldTitleCategory.id)
       }
       const titleCategory = await TitleSubCategory.create({
         name,

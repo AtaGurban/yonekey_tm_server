@@ -16,6 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/static", express.static(path.resolve(__dirname, "files", "images")));
+app.use("/api/static", express.static(path.resolve(__dirname, "files", "convertedVideo")));
 app.use(fileUpload({})); 
 app.use("/api", router); 
 app.use(ErrorHandlingMiddleware);
