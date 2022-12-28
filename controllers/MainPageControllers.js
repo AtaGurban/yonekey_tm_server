@@ -6,6 +6,7 @@ const {
   TitleSubCategory,
   Category,
   SubCategory,
+  MobileAds,
 } = require("../models/models");
 const fs = require("fs");
 const uuid = require("uuid");
@@ -334,6 +335,39 @@ class MainPageController {
       return next(ApiError.internal(error));
     }
   }
+  async clickCategory(req, res, next) {
+    try {
+      const {id} = req.body
+      if (id){
+        const category = await Category.findOne({where:{id}})
+        if (!category){
+          return next(ApiError.internal('error'));
+        }
+        let update = {counter: category.counter + 1}
+        await Category.update(update, {where: {id}})
+      }
+      return res.json(true);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async clickSubCategory(req, res, next) {
+    try {
+      const {id} = req.body
+      if (id){
+        const subCategory = await SubCategory.findOne({where:{id}})
+        if (!subCategory){
+          return next(ApiError.internal('error'));
+        }
+        let update = {counter: subCategory.counter + 1}
+        await SubCategory.update(update, {where: {id}})
+      }
+      return res.json(true);
+    } catch (error) {
+      console.log(error);
+      return next(ApiError.internal(error));
+    }
+  }
   async createSubCategory(req, res, next) {
     try {
       const { name, link, titleSubCategoryId } = req.body;
@@ -489,6 +523,63 @@ class MainPageController {
         await slider.destroy();
       }
       return res.json(true);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async createMobileAds(req, res, next) {
+    try {
+      const { name, link } = req.body;
+      const img = req.files?.img
+      if (!name || !link || !img){
+        return next(ApiError.internal('error'));
+      }
+      let mobileImg = uuid.v4() + `.jpg`;
+      await img.mv(
+        path.resolve(__dirname, "..", "files", "images", mobileImg)
+      );
+      const mobileAds = await MobileAds.create({
+        name, link, mobileImg
+      })  
+      return res.json(mobileAds);
+    } catch (error) {
+      console.log(error);
+      return next(ApiError.internal(error));
+    }
+  }
+  async getMobileAds(req, res, next) {
+    try {
+      const allMobileAds = await MobileAds.findAll()
+      const randomAds = Math.ceil(Math.random() * allMobileAds.length) - 1
+      return res.json(allMobileAds[randomAds]);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async getMobileAdsAll(req, res, next) {
+    try {
+      const allMobileAds = await MobileAds.findAll()
+      return res.json(allMobileAds);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async deleteMobileAds(req, res, next) {
+    try {
+      const { id } = req.query;
+      const mobileAds = await MobileAds.findOne({ where: { id } });
+      if (mobileAds) {
+        fs.unlink(
+          path.resolve(__dirname, "..", "files", "images", mobileAds?.mobileImg),
+          function (err) {
+            if (err) {
+              console.log(err);
+            }
+          }
+        );
+        await mobileAds.destroy();
+      }
+      return res.json(mobileAds);
     } catch (error) {
       return next(ApiError.internal(error));
     }

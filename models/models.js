@@ -132,6 +132,18 @@ const SliderForMainPage = sequelize.define("slider-for-main-page", {
   number: { type: DataTypes.INTEGER, allowNull: false },
 }); 
 
+const MobileAds = sequelize.define("mobile-ads", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  name: { type: DataTypes.STRING, defaultValue: null },
+  link: { type: DataTypes.STRING, defaultValue: null },
+  mobileImg: { type: DataTypes.STRING, defaultValue: null },
+});
+
 const Banner = sequelize.define("banner", {
   id: {
     type: DataTypes.BIGINT,
@@ -177,6 +189,7 @@ module.exports = {
   SubCategory,
   TitleCategory,
   TitleSubCategory,
+  MobileAds,
   Category,
   VideoLowQuality,
   VideoMediumQuality,
