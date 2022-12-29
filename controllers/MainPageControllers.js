@@ -11,6 +11,7 @@ const {
 const fs = require("fs");
 const uuid = require("uuid");
 const path = require("path");
+const { Op } = require("sequelize");
 
 const deleteTitleCategoryFunc = async (id) => {
   try {
@@ -560,6 +561,16 @@ class MainPageController {
     try {
       const allMobileAds = await MobileAds.findAll()
       return res.json(allMobileAds);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async search(req, res, next) {
+    try {
+      const {query} = req.query
+      const category = await Category.findAll({where: { name: { [Op.like]: `%${query}%` } }})
+      const subCategory = await SubCategory.findAll({where: { name: { [Op.like]: `%${query}%` } }})
+      return res.json({category, subCategory});
     } catch (error) {
       return next(ApiError.internal(error));
     }

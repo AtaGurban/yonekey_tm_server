@@ -28,6 +28,7 @@ router.delete('/slider', MainPageControllers.deleteSlider)
 router.post('/mobile-ads', MainPageControllers.createMobileAds)
 router.get('/mobile-ads', MainPageControllers.getMobileAds)
 router.get('/mobile-ads/get', MainPageControllers.getMobileAdsAll)
+router.get('/search', MainPageControllers.search)
 router.delete('/mobile-ads', MainPageControllers.deleteMobileAds)
 
 module.exports = router 
