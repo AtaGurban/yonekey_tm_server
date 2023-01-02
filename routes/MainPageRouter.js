@@ -30,5 +30,13 @@ router.get('/mobile-ads', MainPageControllers.getMobileAds)
 router.get('/mobile-ads/get', MainPageControllers.getMobileAdsAll)
 router.get('/search', MainPageControllers.search)
 router.delete('/mobile-ads', MainPageControllers.deleteMobileAds)
+router.post('/notification', MainPageControllers.createNotification)
+router.get('/notification', MainPageControllers.getNotification)
+router.put('/notification', MainPageControllers.updateNotification)
+router.delete('/notification', MainPageControllers.deleteNotification)
+router.post('/ebay', MainPageControllers.createEbay)
+router.get('/ebay', MainPageControllers.getEbay)
+router.put('/ebay', MainPageControllers.updateEbay)
+router.delete('/ebay', MainPageControllers.deleteEbay)
 
 module.exports = router 

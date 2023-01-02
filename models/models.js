@@ -132,6 +132,31 @@ const SliderForMainPage = sequelize.define("slider-for-main-page", {
   number: { type: DataTypes.INTEGER, allowNull: false },
 }); 
 
+const Notification = sequelize.define("notification", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  title: { type: DataTypes.STRING, defaultValue: null },
+  type: { type: DataTypes.STRING, defaultValue: null },
+  date: { type: DataTypes.DATE, defaultValue: null },
+  mobileImg: { type: DataTypes.STRING, defaultValue: null },
+});
+
+const MyEbay = sequelize.define("my-ebay", {
+  id: {
+    type: DataTypes.BIGINT,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
+  title: { type: DataTypes.STRING, defaultValue: null },
+  description: { type: DataTypes.STRING, defaultValue: null },
+  link: { type: DataTypes.STRING, defaultValue: null },
+});
+
 const MobileAds = sequelize.define("mobile-ads", {
   id: {
     type: DataTypes.BIGINT,
@@ -187,6 +212,8 @@ module.exports = {
   Video,
   File,
   SubCategory,
+  MyEbay,
+  Notification,
   TitleCategory,
   TitleSubCategory,
   MobileAds,

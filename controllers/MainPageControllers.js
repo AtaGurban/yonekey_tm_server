@@ -7,6 +7,9 @@ const {
   Category,
   SubCategory,
   MobileAds,
+  Business,
+  Notification,
+  MyEbay,
 } = require("../models/models");
 const fs = require("fs");
 const uuid = require("uuid");
@@ -570,7 +573,8 @@ class MainPageController {
       const {query} = req.query
       const category = await Category.findAll({where: { name: { [Op.like]: `%${query}%` } }})
       const subCategory = await SubCategory.findAll({where: { name: { [Op.like]: `%${query}%` } }})
-      return res.json({category, subCategory});
+      const business = await Business.findAll({where: { name: { [Op.like]: `%${query}%` } }})
+      return res.json({category, subCategory, business});
     } catch (error) {
       return next(ApiError.internal(error));
     }
@@ -591,6 +595,119 @@ class MainPageController {
         await mobileAds.destroy();
       }
       return res.json(mobileAds);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async deleteNotification(req, res, next) {
+    try {
+      const { id } = req.query;
+      const notification = await Notification.findOne({ where: { id } });
+      if (notification) {
+        fs.unlink(
+          path.resolve(__dirname, "..", "files", "images", notification?.mobileImg),
+          function (err) {
+            if (err) {
+              console.log(err);
+            }
+          }
+        );
+        await notification.destroy();
+      }
+      return res.json(notification);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async createNotification(req, res, next) {
+    try {
+      const { title, date, type } = req.body;
+      const img = req.files?.img
+      if (!title || !date || !type || !img){
+        return next(ApiError.internal('Maglumatlar doly dal'));
+      }
+      let mobileImg = uuid.v4() + `.jpg`;
+      await img.mv(
+        path.resolve(__dirname, "..", "files", "images", mobileImg)
+      );
+      const notification = await Notification.create({
+        mobileImg, title, date, type
+      })
+      return res.json(notification);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async getNotification(req, res, next) {
+    try {
+      const notificationAll = await Notification.findAll()
+      return res.json(notificationAll);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async updateNotification(req, res, next) {
+    try {
+      const { id, title, date, type } = req.body;
+      if (!title || !date || !type || !id){
+        return next(ApiError.internal('Maglumatlar doly dal'));
+      }
+      const notification = await Notification.findOne({ where: { id } });
+      if (!notification) {
+        return next(ApiError.internal('Maglumatlar doly dal'));
+      }
+      await Notification.update({title, date, type}, {where: {id}})
+      return res.json(notification);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async deleteEbay(req, res, next) {
+    try {
+      const { id } = req.query;
+      const ebay = await MyEbay.findOne({ where: { id } });
+      if (ebay) {
+        await ebay.destroy();
+      }
+      return res.json(ebay);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async createEbay(req, res, next) {
+    try {
+      const { title, link, description } = req.body;
+      if (!title || !link || !description){
+        return next(ApiError.internal('Maglumatlar doly dal'));
+      }
+      const ebay = await MyEbay.create({
+        title, link, description
+      })
+      return res.json(ebay);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async getEbay(req, res, next) {
+    try {
+      const ebayAll = await MyEbay.findAll()
+      return res.json(ebayAll);
+    } catch (error) {
+      return next(ApiError.internal(error));
+    }
+  }
+  async updateEbay(req, res, next) {
+    try {
+      const { id, title, link, description } = req.body;
+      if (!title || !link || !description || !id){
+        return next(ApiError.internal('Maglumatlar doly dal'));
+      }
+      const ebay = await MyEbay.findOne({ where: { id } });
+      if (!ebay) {
+        return next(ApiError.internal('Maglumatlar doly dal'));
+      }
+      await MyEbay.update({title, link, description}, {where: {id}})
+      return res.json(ebay);
     } catch (error) {
       return next(ApiError.internal(error));
     }
