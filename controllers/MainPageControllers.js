@@ -648,15 +648,15 @@ class MainPageController {
   }
   async updateNotification(req, res, next) {
     try {
-      const { id, title, date, type } = req.body;
-      if (!title || !date || !type || !id){
+      const { id, title, type } = req.body;
+      if (!title || !type || !id){
         return next(ApiError.internal('Maglumatlar doly dal'));
       }
       const notification = await Notification.findOne({ where: { id } });
       if (!notification) {
         return next(ApiError.internal('Maglumatlar doly dal'));
       }
-      await Notification.update({title, date, type}, {where: {id}})
+      await Notification.update({title, type}, {where: {id}})
       return res.json(notification);
     } catch (error) {
       return next(ApiError.internal(error));
