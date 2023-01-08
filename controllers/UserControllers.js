@@ -1,9 +1,11 @@
 const ApiError = require("../error/ApiError")
+var FormData = require('form-data');
 const bcrypt = require('bcrypt')
 const {User, Transaction, Course} = require('../models/models')
 const jwt = require('jsonwebtoken')
 const uuid = require('uuid')
 const path = require("path");
+const { sendData } = require("../service/CRMSendData")
 
 const generateJwt = (id, email, name, role, phone)=>{
  return jwt.sign({id, email:email, name:name, phone:phone, role:role}, process.env.SECRET_KEY, {expiresIn: '24h'})
@@ -12,7 +14,7 @@ const generateJwt = (id, email, name, role, phone)=>{
 class UserController {
     async registration(req, res, next){
    
-        const {email, name, password, phone, role} = req.body;
+        const {email, name, password, phone, role, forCRM} = req.body;
        
         if (!email || !password || !name || !phone){
             return next(ApiError.badRequest('Maglumatlarynyz nadogry'))
@@ -25,6 +27,16 @@ class UserController {
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await User.create({email, first_name:name, role, phone, password: hashPassword})
         const token = generateJwt(user.id, user.email, user.name, user.role, user.phone)
+        if (forCRM == true){
+            const dataForCRM = new FormData();
+            dataForCRM.append("csrf_token_name", '524a2176533bb4bd9cbcaf9b04accfd2');
+            dataForCRM.append("key", '218d83799b99f55a89892c6fd9d12130');
+            dataForCRM.append("name", `${name}`);
+            dataForCRM.append("email", `${email}`);
+            dataForCRM.append("phonenumber", `${phone}`);
+            const data = await sendData(dataForCRM)
+            console.log(data);
+        }
         return res.json({token})
     }
     async createUser(req, res, next){
