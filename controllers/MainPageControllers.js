@@ -677,7 +677,7 @@ class MainPageController {
   async createEbay(req, res, next) {
     try {
       const { title, link, description } = req.body;
-      if (!title || !link || !description){
+      if (!title || !link ){
         return next(ApiError.internal('Maglumatlar doly dal'));
       }
       const ebay = await MyEbay.create({
@@ -699,7 +699,7 @@ class MainPageController {
   async updateEbay(req, res, next) {
     try {
       const { id, title, link, description } = req.body;
-      if (!title || !link || !description || !id){
+      if (!title || !link  || !id){
         return next(ApiError.internal('Maglumatlar doly dal'));
       }
       const ebay = await MyEbay.findOne({ where: { id } });
