@@ -24,7 +24,7 @@ app.use(ErrorHandlingMiddleware);
  
 const start = async () => {
   const httpServer = http.createServer(app);
-  // const httpsServer = https.createServer(credentials, app); 
+  // const httpsServer = https.createServer(credentials, app);  
   try {
     await sequelize.authenticate();
     await sequelize.sync();

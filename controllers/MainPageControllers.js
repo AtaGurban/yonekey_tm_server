@@ -445,9 +445,10 @@ class MainPageController {
         const oldImages = await ImgForSlider.findAll({
           where: { sliderForMainPageId: oldSlider.id },
         });
-        oldImages.map(async (i) => {
+        for (let i = 0; i < oldImages.length; i++) {
+          const element = oldImages[i];
           fs.unlink(
-            path.resolve(__dirname, "..", "files", "images", i.webImg),
+            path.resolve(__dirname, "..", "files", "images", element.webImg),
             function (err) {
               if (err) {
                 console.log(err);
@@ -455,15 +456,15 @@ class MainPageController {
             }
           );
           fs.unlink(
-            path.resolve(__dirname, "..", "files", "images", i.mobileImg),
+            path.resolve(__dirname, "..", "files", "images", element.mobileImg),
             function (err) {
               if (err) {
                 console.log(err);
               }
             }
           );
-          await i.destroy();
-        });
+          await element.destroy();
+        }
         await oldSlider.destroy();
       }
       const slider = await SliderForMainPage.create({
@@ -488,6 +489,7 @@ class MainPageController {
       }
       return res.json(slider);
     } catch (error) {
+      console.log(error);
       return next(ApiError.internal(error));
     }
   }

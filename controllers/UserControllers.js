@@ -8,7 +8,7 @@ const path = require("path");
 const { sendData } = require("../service/CRMSendData")
 
 const generateJwt = (id, email, name, role, phone)=>{
- return jwt.sign({id, email:email, name:name, phone:phone, role:role}, process.env.SECRET_KEY, {expiresIn: '24h'})
+ return jwt.sign({id, email:email, name:name, phone:phone, role:role}, process.env.SECRET_KEY, {expiresIn: '25d'})
 }
 
 class UserController {
