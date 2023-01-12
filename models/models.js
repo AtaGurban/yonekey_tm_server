@@ -10,6 +10,7 @@ const Video = sequelize.define("video", {
     allowNull: false,
   },
   name: { type: DataTypes.STRING, defaultValue: null },
+  description: { type: DataTypes.TEXT, defaultValue: null }, 
   author: { type: DataTypes.STRING, defaultValue: null },
   video: { type: DataTypes.STRING, defaultValue: null },
   img: { type: DataTypes.STRING, defaultValue: null },
@@ -127,8 +128,8 @@ const SliderForMainPage = sequelize.define("slider-for-main-page", {
     autoIncrement: true,
     allowNull: false,
   },  
-  // text: { type: DataTypes.STRING, defaultValue: null },
-  // link: { type: DataTypes.STRING, allowNull: false },
+  text: { type: DataTypes.STRING, defaultValue: null },
+  link: { type: DataTypes.STRING, defaultValue: null },
   number: { type: DataTypes.INTEGER, allowNull: false },
 }); 
 

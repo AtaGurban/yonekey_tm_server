@@ -436,7 +436,7 @@ class MainPageController {
   }
   async createSlider(req, res, next) {
     try {
-      const { number, countFiles } = req.body;
+      const { number, countFiles, text, link } = req.body;
       if (!number || !countFiles) {
         return next(ApiError.internal("Maglumatlar doly däl"));
       }
@@ -454,7 +454,7 @@ class MainPageController {
                 console.log(err);
               }
             }
-          );
+          ); 
           fs.unlink(
             path.resolve(__dirname, "..", "files", "images", element.mobileImg),
             function (err) {
@@ -468,7 +468,7 @@ class MainPageController {
         await oldSlider.destroy();
       }
       const slider = await SliderForMainPage.create({
-        number,
+        number, text, link
       });
       for (let i = 0; i < countFiles; i++) {
         const webFile = req.files[`fileWeb[${i}]`];
