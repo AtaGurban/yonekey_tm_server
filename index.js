@@ -18,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/static", express.static(path.resolve(__dirname, "files", "images")));
 app.use("/api/static", express.static(path.resolve(__dirname, "files", "convertedVideo")));
+app.use(express.static(path.join(__dirname, "build")));
 app.use(fileUpload({})); 
 app.use("/api", router); 
 app.use(ErrorHandlingMiddleware);
@@ -40,6 +41,9 @@ const start = async () => {
       const user = await models.User.create({email, first_name, role, phone, password: hashPassword})
     }
     await checkConvertVideo()
+    app.get('*', async (req, res) =>{
+      res.sendFile(path.join(__dirname, "build", 'index.html'))
+    })
     // httpsServer.listen(443, () => console.log(`server started on port 443`)); 
     // app.listen(PORT, ()=> console.log(`server started on port ${PORT}`))
   } catch (error) {
@@ -48,34 +52,3 @@ const start = async () => {
 }; 
 
 start();
-
-
- 
-// app.get("/", function (req, res) {
-//   res.sendFile(__dirname + "/index.html");
-// });
-// let id = 0
-// app.get("/video", function (req, res) {
-
-
-
-//   // get video stats (about 61MB)
-
-
-//   // Parse Range
-//   // Example: "bytes=32324-"
-
-
-
-
-// console.log('start', start);
-// console.log('end', end);
-//   // HTTP Status 206 for Partial Content
-
-// });
-
-
-
-// app.listen(8000, function () {
-//   console.log("Listening on port 8000!");
-// });
